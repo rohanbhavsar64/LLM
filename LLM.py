@@ -15,7 +15,7 @@ def create_db():
   data=loader.load()
   db=FAISS.from_documents(documents=data,embedding=embeddings)
   db.save_local(file_path)
-vector_db=FAISS.load_local(file_path,embeddings)
+vector_db=FAISS.load_local(file_path, embeddings)
 r=vector_db.as_retriever()
 chain=RetrievalQA.from_chain_type(llm=h,chain_type='stuff',retriever=r,input_key='query',return_source_documents=True)
 q=st.text_input()
