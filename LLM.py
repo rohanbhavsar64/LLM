@@ -5,7 +5,7 @@ from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
-dt.title('FAQ WEBSITE')
+st.title('FAQ WEBSITE')
 # Set HuggingFace API token
 os.environ['HUGGINGFACEHUB_API_TOKEN'] = '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'
 
