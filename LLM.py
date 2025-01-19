@@ -26,4 +26,4 @@ chain = RetrievalQA.from_chain_type(llm=h, chain_type='stuff', retriever=r, inpu
 q = st.text_input("Ask a question:")
 if q:
     result = chain({"query": q})
-    st.write(result)
+    st.write(result['result'])
