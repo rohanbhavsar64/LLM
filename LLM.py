@@ -33,7 +33,7 @@ if not os.path.exists(file_path):
 vector_db = FAISS.load_local(file_path, embeddings)
 
 # Create retriever
-r = vector_db.as_retriever()
+r = db.as_retriever()
 
 # Create the QA chain
 chain = RetrievalQA.from_chain_type(llm=h, chain_type='stuff', retriever=r, input_key='query', return_source_documents=True)
