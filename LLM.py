@@ -14,18 +14,9 @@ h = HuggingFaceHub(repo_id='google/flan-t5-large', model_kwargs={'temperature': 
 
 # Initialize embeddings
 embeddings = HuggingFaceEmbeddings()
-
-# File path for FAISS index
-file_path = 'faiss_index'
-
-# Function to create and save the FAISS database
-def create_db():
-    loader = CSVLoader(file_path='Cleaned_Ecommerce_FAQs.csv', source_column='Question')
-    data = loader.load()
-    db = FAISS.from_documents(documents=data, embedding=embeddings)
-    #db.save_local(file_path)
-
-# Create retriever
+loader = CSVLoader(file_path='Cleaned_Ecommerce_FAQs.csv', source_column='Question')
+data = loader.load()
+db = FAISS.from_documents(documents=data, embedding=embeddings)
 r = db.as_retriever()
 
 # Create the QA chain
