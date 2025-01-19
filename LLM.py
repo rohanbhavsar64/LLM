@@ -23,14 +23,7 @@ def create_db():
     loader = CSVLoader(file_path='Cleaned_Ecommerce_FAQs.csv', source_column='Question')
     data = loader.load()
     db = FAISS.from_documents(documents=data, embedding=embeddings)
-    db.save_local(file_path)
-
-# Check if FAISS index exists, otherwise create it
-if not os.path.exists(file_path):
-    create_db()
-
-# Load the FAISS vector database
-vector_db = FAISS.load_local(file_path, embeddings)
+    #db.save_local(file_path)
 
 # Create retriever
 r = db.as_retriever()
