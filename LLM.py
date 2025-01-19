@@ -25,6 +25,10 @@ def create_db():
     db = FAISS.from_documents(documents=data, embedding=embeddings)
     db.save_local(file_path)
 
+# Check if FAISS index exists, otherwise create it
+if not os.path.exists(file_path):
+    create_db()
+
 # Load the FAISS vector database
 vector_db = FAISS.load_local(file_path, embeddings)
 
