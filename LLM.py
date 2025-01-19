@@ -14,4 +14,6 @@ embeddings=HuggingFaceEmbeddings()
 db=FAISS.from_documents(documents=data,embedding=embeddings)
 r=db.as_retriever()
 chain=RetrievalQA.from_chain_type(llm=h,chain_type='stuff',retriever=r,input_key='query',return_source_documents=True)
-st.write(chain('If I cancel my order for that do you have mid cancelation refoud policy?')['result'])
+q=st.text_input()
+if q:
+  st.write(chain(q)['result'])
