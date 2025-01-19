@@ -1,1 +1,5 @@
-
+streamlit
+langchain
+huggingface-hub
+faiss-cpu
+pandas
