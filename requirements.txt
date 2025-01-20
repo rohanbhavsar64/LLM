@@ -5,3 +5,8 @@ huggingface-hub
 faiss-cpu
 pandas
 sentence-transformers
+time
+warnings
+torch
+faster-whisper
+
