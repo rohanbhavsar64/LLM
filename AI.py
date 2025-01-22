@@ -145,7 +145,7 @@ if st.button("Send"):
         st.session_state.chat_history.append(f"AI: {response}")
 
         # Clear the input box after submission
-        if user_input is not None:
+        if user_input is None:
             st.session_state.input_box = ""  # Reset the text area value
             st.experimental_rerun()  # Rerun the app to update the chat
 
