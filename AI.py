@@ -7,9 +7,12 @@ import requests
 from datetime import datetime
 import pytz
 
-# Initialize chat history
+# Initialize session state for chat history and query count
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+
+if "query_count" not in st.session_state:
+    st.session_state.query_count = 0
 
 # Global variables
 order_info = None
@@ -109,29 +112,26 @@ class FAQSystem:
         return context, refined_answer
 
     def refine_answer_with_falcon(self, user_query, context, india_datetime):
-        # Combine chat history into a single formatted string
         chat_history_text = "\n".join(st.session_state.chat_history)
 
         if context == "No relevant answers found.":
             prompt = (
-                "You are a helpful customer care agent. You must remember and use the entire previous conversation "
-                "to provide coherent and context-aware responses. When users ask casual or conversational questions, "
-                "respond with polite and conversational replies.\n"
+                "You are a helpful customer care agent. Use the entire previous conversation to provide coherent and "
+                "context-aware responses.\n"
                 f"Conversation History:\n{chat_history_text}\n"
                 f"User Query: {user_query}\n"
                 f"Indian Date and Time: {india_datetime}\n"
-                "Answer (Based on the entire conversation history, provide a concise and polite response):"
+                "Answer:"
             )
         else:
             prompt = (
-                "You are a well-experienced e-commerce customer service representative. You must remember and use the "
-                "entire previous conversation to provide contextually appropriate responses. "
-                "Focus on addressing the user's query directly while maintaining professionalism.\n"
+                "You are an experienced e-commerce customer service representative. Use the entire conversation to "
+                "provide contextually appropriate responses.\n"
                 f"Conversation History:\n{chat_history_text}\n"
                 f"User Query: {user_query}\n"
                 f"Context: {context}\n"
                 f"Indian Date and Time: {india_datetime}\n"
-                "Answer (Based on the provided context and entire conversation history, give a concise and helpful response):"
+                "Answer:"
             )
 
         api_url = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
@@ -163,43 +163,32 @@ st.title("E-commerce Customer Support Chatbot")
 faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="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")
 retriever = OrderInfoRetriever(file_path="CRM.csv")
 
-# Function to process user queries and update the chat
-def process_chat(user_input):
-    global order_info
-    if retriever.get_intent(user_input):
-        order_info = retriever.get_order_details(user_input)
-        if order_info:
-            context, refined_answer = faq_system.process_user_query(user_input, order_info)
-            return refined_answer
-    else:
-        context, refined_answer = faq_system.process_user_query(user_input, order_info)
-        return refined_answer
-
-# Create a new input tab dynamically for each query
-if "query_count" not in st.session_state:
-    st.session_state.query_count = 0
-
-if "queries" not in st.session_state:
-    st.session_state.queries = []
-
-# Loop to handle multiple input tabs
+# Loop to dynamically create new input fields after each query
 for i in range(st.session_state.query_count + 1):
-    user_input = st.text_input(f"Query {i + 1}:", key=f"input_{i}", placeholder="Ask your question here...")
+    user_input = st.text_input(f"Query {i + 1}:", key=f"input_{i}", placeholder="Type your question here...")
 
-    while user_input:
-        # Add user input to the query list
-        st.session_state.queries.append(user_input)
+    if user_input:
+        # Add user input to chat history
         st.session_state.chat_history.append(f"You: {user_input}")
 
-        # Process the query
-        response = process_chat(user_input)
-        st.session_state.chat_history.append(f"AI: {response}")
-        st.success(response)
+        # Process the input
+        if retriever.get_intent(user_input):
+            order_info = retriever.get_order_details(user_input)
+            if order_info:
+                context, refined_answer = faq_system.process_user_query(user_input, order_info)
+            else:
+                refined_answer = "Order not found. Please check the Order ID."
+        else:
+            context, refined_answer = faq_system.process_user_query(user_input)
 
-        # Increase the query count to add a new input tab
+        # Add AI response to chat history
+        st.session_state.chat_history.append(f"AI: {refined_answer}")
+        st.success(refined_answer)
+
+        # Increment query count to create a new input field
         st.session_state.query_count += 1
 
-# Display the chat history
+# Display chat history
 st.write("### Conversation History")
 for entry in st.session_state.chat_history:
     st.write(entry)
