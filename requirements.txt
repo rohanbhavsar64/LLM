@@ -1,12 +1,10 @@
 streamlit
-langchain
-langchain_community
-huggingface-hub
-faiss-cpu
 pandas
 sentence-transformers
-time
-warnings
+numpy
+requests
+pytz
 torch
-faster-whisper
+transformers
+
 
