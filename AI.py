@@ -160,7 +160,7 @@ class FAQSystem:
 # Streamlit Interface
 st.title("E-commerce Customer Support Chatbot")
 
-faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="YOUR_API_KEY")
+faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="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")
 retriever = OrderInfoRetriever(file_path="CRM.csv")
 
 user_input = st.text_input("You:", placeholder="Ask your question here...")
