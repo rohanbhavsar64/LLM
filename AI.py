@@ -165,8 +165,7 @@ retriever = OrderInfoRetriever(file_path="CRM.csv")
 
 # Allow the user to ask unlimited queries
 while True:
-    user_input =''
-
+    user_input = st.text_input(f"Query {len(st.session_state.chat_history) // 2 + 1}:", key=f"query_{len(st.session_state.chat_history)}")
     if user_input:
         user_input = st.text_input(f"Query {len(st.session_state.chat_history) // 2 + 1}:", key=f"query_{len(st.session_state.chat_history)}")
         # Add user input to chat history
