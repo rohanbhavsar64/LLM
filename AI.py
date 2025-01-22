@@ -27,7 +27,7 @@ if "queries" not in st.session_state:
 for i in range(st.session_state.query_count + 1):
     user_input = st.text_input(f"Query {i + 1}:", key=f"input_{i}", placeholder="Ask your question here...")
 
-    if user_input:
+    while user_input:
         # Add user input to the query list
         st.session_state.queries.append(user_input)
         st.session_state.chat_history.append(f"You: {user_input}")
