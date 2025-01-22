@@ -11,6 +11,9 @@ import pytz
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
+# Initialize user query input box
+if "user_input" not in st.session_state:
+    st.session_state.user_input = ""
 
 class OrderInfoRetriever:
     def __init__(self, file_path):
@@ -116,18 +119,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Display the conversation
-for i, message in enumerate(st.session_state.chat_history):
+for message in st.session_state.chat_history:
     if message.startswith("You:"):
         st.markdown(f'<div class="user-message">{message[4:]}</div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="bot-message">{message[4:]}</div>', unsafe_allow_html=True)
 
 # Input box for user query
-user_input = st.text_input("Type your message here...", key="input_box")
+user_input = st.text_input("Type your message here...", key="input_box", value=st.session_state.user_input)
 
+# Process user query if provided
 if user_input:
     # Add user query to chat history
     st.session_state.chat_history.append(f"You: {user_input}")
+    st.session_state.user_input = ""  # Clear input box after submission
 
     # Process user query
     order_info = retriever.get_order_details(user_input)
@@ -138,4 +143,11 @@ if user_input:
 
     # Add AI response to chat history
     st.session_state.chat_history.append(f"AI: {response}")
-    st.rerun()  # Refresh the app to display the latest messages
+
+# Display the chat history
+st.write("### Conversation History")
+for message in st.session_state.chat_history:
+    if message.startswith("You:"):
+        st.markdown(f'<div class="user-message">{message[4:]}</div>', unsafe_allow_html=True)
+    else:
+        st.markdown(f'<div class="bot-message">{message[4:]}</div>', unsafe_allow_html=True)
