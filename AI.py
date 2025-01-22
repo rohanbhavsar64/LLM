@@ -163,15 +163,15 @@ st.title("E-commerce Customer Support Chatbot")
 faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="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")
 retriever = OrderInfoRetriever(file_path="CRM.csv")
 
-# Dynamically create text input fields for each query
-for i in range(st.session_state.query_count + 1):
-    user_input = st.text_input(f"Query {i + 1}:", key=f"input_{i}", placeholder="Type your question here...")
+# Allow the user to ask unlimited queries
+while True:
+    user_input = st.text_input(f"Query {len(st.session_state.chat_history) // 2 + 1}:", key=f"query_{len(st.session_state.chat_history)}")
 
     if user_input:
-        # Save user query
+        # Add user input to chat history
         st.session_state.chat_history.append(f"You: {user_input}")
 
-        # Process the query
+        # Process the input
         if retriever.get_intent(user_input):
             order_info = retriever.get_order_details(user_input)
             if order_info:
@@ -184,9 +184,6 @@ for i in range(st.session_state.query_count + 1):
         # Add AI response to chat history
         st.session_state.chat_history.append(f"AI: {refined_answer}")
         st.success(refined_answer)
-
-        # Increment the query count to create a new input field
-        st.session_state.query_count += 1
 
 # Display conversation history
 st.write("### Conversation History")
