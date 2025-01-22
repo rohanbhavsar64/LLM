@@ -93,65 +93,78 @@ class FAQSystem:
 
 
 # Streamlit Interface
-st.title("WhatsApp-Like E-commerce Chatbot")
+st.title("Telegram-Like E-commerce Chatbot")
 
 faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="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")
 retriever = OrderInfoRetriever(file_path="CRM.csv")
 
-# Chat Interface
+# Styling for Telegram-Like Chat
 st.markdown("""
 <style>
-    .user-message {
-        background-color: #DCF8C6;
-        padding: 10px;
+    .chat-container {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
         border-radius: 10px;
-        margin-bottom: 10px;
+        padding: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .user-message {
+        background-color: #dcf8c6;
+        padding: 8px 12px;
+        border-radius: 15px;
+        margin-bottom: 8px;
         text-align: right;
+        width: fit-content;
+        margin-left: auto;
     }
     .bot-message {
-        background-color: #ECECEC;
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 10px;
+        background-color: #eaeaea;
+        padding: 8px 12px;
+        border-radius: 15px;
+        margin-bottom: 8px;
         text-align: left;
+        width: fit-content;
+        margin-right: auto;
+    }
+    .input-container {
+        display: flex;
+        margin-top: 10px;
+    }
+    .input-box {
+        flex: 1;
+        margin-right: 10px;
+        padding: 10px;
+        border-radius: 15px;
+        border: 1px solid #ddd;
+    }
+    .send-button {
+        background-color: #0088cc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 15px;
+        cursor: pointer;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Display the conversation
+# Display the chat conversation
+st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 for chat_input in st.session_state.chat_history:
     if chat_input.startswith("You:"):
         st.markdown(f'<div class="user-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
     else:
         st.markdown(f'<div class="bot-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Textbox for input message
-chat_input = st.text_area("Type your message here...", key="chat_input", height=100, value=st.session_state.chat_input)
+# Input box and send button
+st.markdown('<div class="input-container">', unsafe_allow_html=True)
+chat_input = st.text_area("", key="chat_input", height=40, label_visibility="collapsed")
+send = st.button("Send", use_container_width=False)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# Handle sending the message
-if st.button("Send"):
-    if chat_input:
-        # Add user query to chat history
-        st.session_state.chat_history.append(f"You: {chat_input}")
-
-        # Process user query
-        order_info = retriever.get_order_details(chat_input)
-        if order_info:
-            response = f"Order Info: {order_info}"
-        else:
-            response = faq_system.get_response(chat_input)
-
-        # Add AI response to chat history
-        st.session_state.chat_history.append(f"AI: {response}")
-
-        # Reset the chat_input for next query
-        st.session_state.chat_input = ""  # Reset the text area value
-        st.experimental_rerun()  # Rerun the app to update the chat
-
-# Display the chat history again to reflect the latest messages
-st.write("### Conversation History")
-for chat_input in st.session_state.chat_history:
-    if chat_input.startswith("You:"):
-        st.markdown(f'<div class="user-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
-    else:
-        st.markdown(f'<div class="bot-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
+# Process user query if "Send" is clicked
+if send and chat_input:
+    # Add user query to chat history
+    st.session_state.chat_history.append(f"You
