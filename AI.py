@@ -138,4 +138,4 @@ if user_input:
 
     # Add AI response to chat history
     st.session_state.chat_history.append(f"AI: {response}")
-    st.experimental_rerun()  # Refresh the app to display the latest messages
+    st.rerun()  # Refresh the app to display the latest messages
