@@ -144,7 +144,10 @@ if user_input:
     # Add AI response to chat history
     st.session_state.chat_history.append(f"AI: {response}")
 
-# Display the chat history
+    # Reset the text input box and display the next one
+    st.session_state.user_input = ""  # Reset the input field for the next query
+
+# Display the chat history again to reflect the latest messages
 st.write("### Conversation History")
 for message in st.session_state.chat_history:
     if message.startswith("You:"):
