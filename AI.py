@@ -4,8 +4,6 @@ import re
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import requests
-from datetime import datetime
-import pytz
 
 # Initialize chat history
 if "chat_history" not in st.session_state:
@@ -72,25 +70,6 @@ class FAQSystem:
                 return self.answers[i]
         return "I couldn't find a relevant answer. Can you please rephrase your query?"
 
-    def refine_answer(self, user_query, context=None):
-        chat_history_text = "\n".join(st.session_state.chat_history)
-        prompt = (
-            f"Conversation History:\n{chat_history_text}\n"
-            f"User Query: {user_query}\n"
-            "Answer:"
-        )
-
-        api_url = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
-        headers = {"Authorization": f"Bearer {self.api_key}"}
-        payload = {"inputs": prompt, "parameters": {"max_length": 300}}
-
-        try:
-            response = requests.post(api_url, headers=headers, json=payload)
-            response.raise_for_status()
-            return response.json()[0]["generated_text"].strip()
-        except Exception:
-            return "Sorry, I'm unable to process your query at the moment."
-
 
 # Streamlit Interface
 st.title("Telegram-Like E-commerce Chatbot")
@@ -98,58 +77,43 @@ st.title("Telegram-Like E-commerce Chatbot")
 faq_system = FAQSystem(faq_path="Cleaned_Ecommerce_FAQs.csv", api_key="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")
 retriever = OrderInfoRetriever(file_path="CRM.csv")
 
-# Styling for Telegram-Like Chat
+# Telegram-like styles
 st.markdown("""
 <style>
-    .chat-container {
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 10px;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    .user-message {
-        background-color: #dcf8c6;
-        padding: 8px 12px;
-        border-radius: 15px;
-        margin-bottom: 8px;
-        text-align: right;
-        width: fit-content;
-        margin-left: auto;
-    }
-    .bot-message {
-        background-color: #eaeaea;
-        padding: 8px 12px;
-        border-radius: 15px;
-        margin-bottom: 8px;
-        text-align: left;
-        width: fit-content;
-        margin-right: auto;
-    }
-    .input-container {
-        display: flex;
-        margin-top: 10px;
-    }
-    .input-box {
-        flex: 1;
-        margin-right: 10px;
-        padding: 10px;
-        border-radius: 15px;
-        border: 1px solid #ddd;
-    }
-    .send-button {
-        background-color: #0088cc;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 15px;
-        cursor: pointer;
-    }
+.chat-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+.user-message {
+    background-color: #0088cc;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+    float: right;
+    clear: both;
+    max-width: 70%;
+}
+.bot-message {
+    background-color: #eeeeee;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    float: left;
+    clear: both;
+    max-width: 70%;
+}
 </style>
 """, unsafe_allow_html=True)
 
-# Display the chat conversation
+# Chat container for conversation
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 for chat_input in st.session_state.chat_history:
     if chat_input.startswith("You:"):
@@ -159,12 +123,25 @@ for chat_input in st.session_state.chat_history:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Input box and send button
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
-chat_input = st.text_area("", key="chat_input", height=40, label_visibility="collapsed")
-send = st.button("Send", use_container_width=False)
-st.markdown('</div>', unsafe_allow_html=True)
+col1, col2 = st.columns([4, 1])
+with col1:
+    chat_input = st.text_area("Type your message here...", key="chat_input", height=50, value=st.session_state.chat_input)
+with col2:
+    if st.button("Send"):
+        if chat_input:
+            # Add user query to chat history
+            st.session_state.chat_history.append(f"You: {chat_input}")
 
-# Process user query if "Send" is clicked
-if send and chat_input:
-    # Add user query to chat history
-    st.session_state.chat_history.append(f"You
+            # Process user query
+            order_info = retriever.get_order_details(chat_input)
+            if order_info:
+                response = f"Order Info: {order_info}"
+            else:
+                response = faq_system.get_response(chat_input)
+
+            # Add AI response to chat history
+            st.session_state.chat_history.append(f"AI: {response}")
+
+            # Reset chat input for next message
+            st.session_state.chat_input = ""  # Clear input box for next message
+            st.experimental_rerun()  # Refresh app to show the latest messages
