@@ -183,7 +183,9 @@ for i in range(st.session_state.query_count + 1):
 
         # Add AI response to chat history
         st.session_state.chat_history.append(f"AI: {refined_answer}")
-        st.success(refined_answer)
+        if st.success(refined_answer):
+            user_input = st.text_input(f"Query {i + 1}:", key=f"input_{i}", placeholder="Type your question here...")
+            
 
         # Increment query count to create a new input field
         st.session_state.query_count += 1
