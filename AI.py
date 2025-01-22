@@ -11,9 +11,9 @@ import pytz
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Initialize user query input box
-if "user_input" not in st.session_state:
-    st.session_state.user_input = ""
+# Initialize user chat input box
+if "chat_input" not in st.session_state:
+    st.session_state.chat_input = ""
 
 class OrderInfoRetriever:
     def __init__(self, file_path):
@@ -119,39 +119,39 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Display the conversation
-for message in st.session_state.chat_history:
-    if message.startswith("You:"):
-        st.markdown(f'<div class="user-message">{message[4:]}</div>', unsafe_allow_html=True)
+for chat_input in st.session_state.chat_history:
+    if chat_input.startswith("You:"):
+        st.markdown(f'<div class="user-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="bot-message">{message[4:]}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="bot-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
 
 # Textbox for input message
-user_input = st.text_area("Type your message here...", key="input_box", height=100)
+chat_input = st.text_area("Type your message here...", key="chat_input", height=100, value=st.session_state.chat_input)
 
 # Handle sending the message
 if st.button("Send"):
-    if user_input:
+    if chat_input:
         # Add user query to chat history
-        st.session_state.chat_history.append(f"You: {user_input}")
+        st.session_state.chat_history.append(f"You: {chat_input}")
 
         # Process user query
-        order_info = retriever.get_order_details(user_input)
+        order_info = retriever.get_order_details(chat_input)
         if order_info:
             response = f"Order Info: {order_info}"
         else:
-            response = faq_system.get_response(user_input)
+            response = faq_system.get_response(chat_input)
 
         # Add AI response to chat history
         st.session_state.chat_history.append(f"AI: {response}")
 
-        # Clear the input box after submission
-        st.session_state.user_input = ""  # Reset the text area value
-        st.rerun()  # Rerun the app to update the chat
+        # Reset the chat_input for next query
+        st.session_state.chat_input = ""  # Reset the text area value
+        st.experimental_rerun()  # Rerun the app to update the chat
 
 # Display the chat history again to reflect the latest messages
 st.write("### Conversation History")
-for message in st.session_state.chat_history:
-    if message.startswith("You:"):
-        st.markdown(f'<div class="user-message">{message[4:]}</div>', unsafe_allow_html=True)
+for chat_input in st.session_state.chat_history:
+    if chat_input.startswith("You:"):
+        st.markdown(f'<div class="user-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="bot-message">{message[4:]}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="bot-message">{chat_input[4:]}</div>', unsafe_allow_html=True)
