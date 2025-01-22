@@ -146,7 +146,7 @@ if st.button("Send"):
 
         # Clear the input box after submission
         st.session_state.user_input = ""  # Reset the text area value
-        st.experimental_rerun()  # Rerun the app to update the chat
+        st.rerun()  # Rerun the app to update the chat
 
 # Display the chat history again to reflect the latest messages
 st.write("### Conversation History")
