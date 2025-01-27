@@ -1,10 +1,11 @@
 streamlit
-pandas
+streamlit-chat
+langchain
+langchain-huggingface
+langchain-community
 sentence-transformers
-numpy
-requests
-pytz
-torch
-transformers
+faiss-cpu
+python-dotenv
+
 
 
