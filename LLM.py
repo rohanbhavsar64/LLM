@@ -12,13 +12,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Retrieve Hugging Face API token from .env
-HUGGINGFACEHUB_API_TOKEN = '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'
+HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
 if not HUGGINGFACEHUB_API_TOKEN:
     raise ValueError("Hugging Face API token is missing. Please check your .env file.")
 
 DB_FAISS_PATH = 'vectorstore/db_faiss'
-
 
 def load_llm():
     repo_id = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
@@ -29,7 +28,6 @@ def load_llm():
         max_new_tokens=500
     )
     return llm
-
 
 st.title("Chat with CSV using Falcon-7B 🦙🦜")
 st.markdown("<h3 style='text-align: center; color: white;'>Built by D4X ❤️</h3>", unsafe_allow_html=True)
@@ -51,9 +49,9 @@ if uploaded_file:
     if data:
         embeddings = HuggingFaceEmbeddings(
             model_name='sentence-transformers/all-MiniLM-L6-v2',
-            model_kwargs={'device': 'cpu'}
+            model_kwargs={'device': 'cuda'}
         )
-
+        
         if not os.path.exists(DB_FAISS_PATH):
             os.makedirs(DB_FAISS_PATH)
 
@@ -65,7 +63,6 @@ if uploaded_file:
 
         if 'history' not in st.session_state:
             st.session_state['history'] = []
-
 
         def conversational_chat(query):
             # Retrieve relevant context from the CSV
@@ -121,7 +118,6 @@ if uploaded_file:
             # Store the current query and response in conversation history (as a tuple)
             st.session_state["history"].append((query, response))
             return response
-
 
         if 'generated' not in st.session_state:
             st.session_state['generated'] = ["Hello! Ask me anything about " + uploaded_file.name + " 🤗"]
