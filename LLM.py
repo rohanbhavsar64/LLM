@@ -48,7 +48,7 @@ if uploaded_file:
     if data:
         embeddings = HuggingFaceEmbeddings(
             model_name='sentence-transformers/all-MiniLM-L6-v2',
-            model_kwargs={'device': 'cuda'}
+            model_kwargs={'device': 'cpu'}
         )
         
         if not os.path.exists(DB_FAISS_PATH):
