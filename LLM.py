@@ -11,8 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Retrieve Hugging Face API token from .env
-HUGGINGFACEHUB_API_TOKEN = "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"
+HUGGINGFACEHUB_API_TOKEN = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 
 if not HUGGINGFACEHUB_API_TOKEN:
     raise ValueError("Hugging Face API token is missing. Please check your .env file.")
